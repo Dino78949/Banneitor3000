@@ -1,1 +1,407 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Banna</title>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #e9edf2;
+    --card: #ffffff;
+    --ink: #14181f;
+    --muted: #5b6676;
+    --line: #cfd6df;
+    --stamp: #c4161c;
+    --btn: #14181f;
+    --btn-ink: #ffffff;
+    --drop: #f4f6f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1217;
+      --card: #191e26;
+      --ink: #f1f3f6;
+      --muted: #97a1b0;
+      --line: #2f3744;
+      --stamp: #ff4048;
+      --btn: #f1f3f6;
+      --btn-ink: #14181f;
+      --drop: #12161c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1217;
+    --card: #191e26;
+    --ink: #f1f3f6;
+    --muted: #97a1b0;
+    --line: #2f3744;
+    --stamp: #ff4048;
+    --btn: #f1f3f6;
+    --btn-ink: #14181f;
+    --drop: #12161c;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    line-height: 1.45;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  main { width: 100%; max-width: 440px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  h1 { font-size: 1.5rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; }
+  p.sub { margin: 0 0 22px; color: var(--muted); }
+  [hidden] { display: none !important; }
+
+  .drop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; text-align: center;
+    border: 2px dashed var(--line);
+    background: var(--drop);
+    border-radius: 12px;
+    min-height: 170px;
+    padding: 18px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .drop:hover, .drop.over { border-color: var(--ink); }
+  .drop:focus-within { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .drop img { max-width: 100%; max-height: 120px; object-fit: contain; }
+  .drop .hint { color: var(--muted); font-size: .95rem; }
+  .drop strong { font-size: 1.05rem; }
+
+  button, .link {
+    font: inherit;
+  }
+  .btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 13px 16px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--btn);
+    color: var(--btn-ink);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+  .btn:focus-visible, .link:focus-visible, input[type=text]:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .btn.danger { background: var(--stamp); color: #fff; }
+  .link {
+    background: none; border: 0; padding: 6px 0; margin-top: 8px;
+    color: var(--muted); text-decoration: underline; cursor: pointer; width: 100%; text-align: center;
+  }
+
+  label { display: block; font-weight: 600; margin-bottom: 8px; }
+  input[type=text] {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--drop);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.05rem;
+  }
+  .logo-mini { display: block; max-height: 56px; max-width: 70%; object-fit: contain; margin: 0 auto 18px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 18px 0 0; min-width: 0; }
+  .chips legend { font-weight: 600; margin-bottom: 8px; padding: 0; }
+  .chip { display: inline-block; margin: 0; font-weight: 400; position: relative; }
+  .chip input { position: absolute; opacity: 0; pointer-events: none; }
+  .chip span { display: inline-block; padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--drop); cursor: pointer; font-size: .95rem; }
+  .chip input:checked + span { background: var(--ink); color: var(--card); border-color: var(--ink); }
+  .chip input:focus-visible + span { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .custom { display: flex; gap: 8px; margin-top: 12px; }
+  .custom input, .custom select {
+    padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--drop); color: var(--ink); font: inherit; min-width: 0;
+  }
+  .custom input { width: 90px; }
+  .custom select { flex: 1; }
+  .custom input:focus-visible, .custom select:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  .avatar-pick { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; font-weight: 400; cursor: pointer; position: relative; }
+  .avatar-pick input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+  .avatar-circle {
+    width: 72px; height: 72px; border-radius: 50%; border: 2px dashed var(--line);
+    background: var(--drop); display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex: none; color: var(--muted); font-size: .85rem; text-align: center;
+  }
+  .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .avatar-pick:focus-within .avatar-circle { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .avatar-pick .txt strong { display: block; }
+  .avatar-pick .txt span { color: var(--muted); font-size: .9rem; }
+  .person {
+    width: 104px; height: 104px; border-radius: 50%; object-fit: cover; display: block;
+    margin: 0 auto 14px; border: 3px solid var(--line); filter: grayscale(1) contrast(1.05);
+  }
+
+  .credits {
+    margin-top: 14px;
+    color: var(--muted);
+    text-align: center;
+    font-size: .88rem;
+  }
+  .credits p { margin: 3px 0; }
+  .credits a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  /* Result */
+  .notice { text-align: center; padding: 8px 0 4px; }
+  .notice .logo-big { max-height: 90px; max-width: 70%; object-fit: contain; margin: 0 auto 18px; display: block; }
+  .notice .who {
+    font-size: clamp(1.6rem, 8vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 6px 0 10px;
+    word-break: break-word;
+    letter-spacing: -0.02em;
+  }
+  .notice .reason { color: var(--muted); margin: 0 0 30px; }
+  .stamp {
+    display: inline-block;
+    border: 6px solid var(--stamp);
+    color: var(--stamp);
+    border-radius: 10px;
+    padding: 4px 22px 2px;
+    font-family: "Arial Black", Impact, "Helvetica Neue", Arial, sans-serif;
+    font-size: clamp(2.4rem, 13vw, 3.6rem);
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    transform: rotate(-8deg);
+    background: color-mix(in srgb, var(--stamp) 8%, transparent);
+  }
+  .stamp.slam { animation: slam .45s cubic-bezier(.2, 1.4, .4, 1) both; }
+  .card.shake { animation: shake .35s .28s linear; }
+  @keyframes slam {
+    0%   { transform: rotate(-8deg) scale(3.2); opacity: 0; }
+    60%  { opacity: 1; }
+    100% { transform: rotate(-8deg) scale(1); opacity: 1; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-5px, 3px); }
+    40% { transform: translate(5px, -3px); }
+    60% { transform: translate(-3px, 2px); }
+    80% { transform: translate(3px, -2px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stamp.slam, .card.shake { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="card" id="card">
+
+    <!-- Step 1: logo -->
+    <section id="step-logo">
+      <h1>Carica il logo</h1>
+      <p class="sub">Trascinalo qui oppure scegli un'immagine.</p>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept="image/*">
+        <span id="drop-empty">
+          <strong>Scegli un'immagine</strong><br>
+          <span class="hint">PNG, JPG, SVG o WebP</span>
+        </span>
+        <img id="preview" alt="Anteprima del logo" hidden>
+      </label>
+      <button class="btn" id="go-name" disabled>Continua</button>
+      <button class="link" id="skip-logo" type="button">Continua senza logo</button>
+    </section>
+
+    <!-- Step 2: name -->
+    <section id="step-name" hidden>
+      <img class="logo-mini" id="logo-mini" alt="Logo" hidden>
+      <h1>Chi vuoi bannare?</h1>
+      <p class="sub">Scrivi il nome della persona.</p>
+      <label class="avatar-pick">
+        <input type="file" id="photo" accept="image/*">
+        <span class="avatar-circle"><span id="photo-empty">Foto</span><img id="photo-thumb" alt="Anteprima della foto" hidden></span>
+        <span class="txt"><strong>Foto della persona</strong><span>Facoltativa</span></span>
+      </label>
+      <label for="name">Nome</label>
+      <input type="text" id="name" maxlength="40" autocomplete="off" placeholder="Es. Marco">
+      <fieldset class="chips">
+        <legend>Per quanto tempo?</legend>
+        <label class="chip"><input type="radio" name="dur" value="1 ora"><span>1 ora</span></label>
+        <label class="chip"><input type="radio" name="dur" value="1 giorno" checked><span>1 giorno</span></label>
+        <label class="chip"><input type="radio" name="dur" value="1 settimana"><span>1 settimana</span></label>
+        <label class="chip"><input type="radio" name="dur" value="1 mese"><span>1 mese</span></label>
+        <label class="chip"><input type="radio" name="dur" value="forever"><span>Per sempre</span></label>
+        <label class="chip"><input type="radio" name="dur" value="custom"><span>Scegli tu</span></label>
+      </fieldset>
+      <div class="custom" id="custom-row" hidden>
+        <input type="number" id="custom-n" min="1" max="999" value="1" aria-label="Quantità">
+        <select id="custom-u" aria-label="Unità di tempo">
+          <option value="ore">ore</option>
+          <option value="giorni" selected>giorni</option>
+          <option value="settimane">settimane</option>
+          <option value="mesi">mesi</option>
+          <option value="anni">anni</option>
+        </select>
+      </div>
+      <button class="btn danger" id="ban" disabled>Banna</button>
+      <button class="link" id="change-logo" type="button">Cambia logo</button>
+    </section>
+
+    <!-- Step 3: result -->
+    <section id="step-result" hidden>
+      <div class="notice">
+        <img class="logo-big" id="logo-big" alt="Logo" hidden>
+        <img class="person" id="person" alt="Foto della persona bannata" hidden>
+        <div class="who" id="who"></div>
+        <p class="reason" id="reason"></p>
+        <div class="stamp" id="stamp">Bannato</div>
+      </div>
+      <button class="btn" id="again">Banna un'altra persona</button>
+    </section>
+
+  </div>
+  <footer class="credits" aria-label="Contatti">
+    <p>Fatto da Botonii</p>
+    <p><a href="mailto:botoniicommercial@gmail.com">botoniicommercial@gmail.com</a></p>
+    <p><a href="tel:+3930118902">393 011 8902</a></p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var logoData = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var card = $('card');
+  var steps = { logo: $('step-logo'), name: $('step-name'), result: $('step-result') };
+
+  function show(which) {
+    Object.keys(steps).forEach(function (k) { steps[k].hidden = (k !== which); });
+  }
+
+  function setLogo(src) {
+    logoData = src;
+    [$('logo-mini'), $('logo-big')].forEach(function (img) {
+      if (src) { img.src = src; img.hidden = false; } else { img.removeAttribute('src'); img.hidden = true; }
+    });
+  }
+
+  function loadFile(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var src = reader.result;
+      $('preview').src = src;
+      $('preview').hidden = false;
+      $('drop-empty').hidden = true;
+      $('go-name').disabled = false;
+      setLogo(src);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  $('file').addEventListener('change', function (e) { loadFile(e.target.files[0]); });
+
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); });
+  });
+  drop.addEventListener('drop', function (e) {
+    if (e.dataTransfer && e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+  });
+
+  $('go-name').addEventListener('click', function () { show('name'); $('name').focus(); });
+  $('skip-logo').addEventListener('click', function () { setLogo(null); show('name'); $('name').focus(); });
+  $('change-logo').addEventListener('click', function () { show('logo'); });
+
+  var photoData = null;
+  $('photo').addEventListener('change', function (e) {
+    var f = e.target.files[0];
+    if (!f || !/^image\//.test(f.type)) return;
+    var r = new FileReader();
+    r.onload = function () {
+      photoData = r.result;
+      $('photo-thumb').src = photoData;
+      $('photo-thumb').hidden = false;
+      $('photo-empty').hidden = true;
+    };
+    r.readAsDataURL(f);
+  });
+
+  var nameInput = $('name');
+  nameInput.addEventListener('input', function () {
+    $('ban').disabled = nameInput.value.trim() === '';
+  });
+  nameInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !$('ban').disabled) $('ban').click();
+  });
+
+  $('ban').addEventListener('click', function () {
+    var name = nameInput.value.trim();
+    if (!name) return;
+    $('who').textContent = name;
+    $('reason').textContent = 'è stato bannato ' + durationText() + '.';
+    if (photoData) { $('person').src = photoData; $('person').hidden = false; }
+    else { $('person').removeAttribute('src'); $('person').hidden = true; }
+    show('result');
+    var stamp = $('stamp');
+    stamp.classList.remove('slam');
+    card.classList.remove('shake');
+    void stamp.offsetWidth; // restart animation
+    stamp.classList.add('slam');
+    card.classList.add('shake');
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="dur"]'), function (r) {
+    r.addEventListener('change', function () {
+      $('custom-row').hidden = (document.querySelector('input[name="dur"]:checked').value !== 'custom');
+      if (!$('custom-row').hidden) $('custom-n').focus();
+    });
+  });
+
+  function durationText() {
+    var v = document.querySelector('input[name="dur"]:checked').value;
+    if (v === 'forever') return 'per sempre';
+    if (v === 'custom') {
+      var n = Math.min(999, Math.max(1, parseInt($('custom-n').value, 10) || 1));
+      var forms = { ore: ['ora', 'ore'], giorni: ['giorno', 'giorni'], settimane: ['settimana', 'settimane'], mesi: ['mese', 'mesi'], anni: ['anno', 'anni'] };
+      return 'per ' + n + ' ' + forms[$('custom-u').value][n === 1 ? 0 : 1];
+    }
+    return 'per ' + v;
+  }
+
+  $('again').addEventListener('click', function () {
+    nameInput.value = '';
+    photoData = null;
+    $('photo').value = '';
+    $('photo-thumb').removeAttribute('src');
+    $('photo-thumb').hidden = true;
+    $('photo-empty').hidden = false;
+    $('ban').disabled = true;
+    show('name');
+    nameInput.focus();
+  });
+})();
+</script>
+</body>
+</html>
 
